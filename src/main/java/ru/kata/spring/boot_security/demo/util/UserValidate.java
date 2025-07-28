@@ -28,8 +28,7 @@ public class UserValidate implements Validator {
         User user = (User) target;
 
         Optional<User> foundUser = userRepository.findByName(user.getUsername());
-        if (foundUser.isEmpty())
-            return;
+        if (foundUser.isEmpty()) return;
 
         errors.rejectValue("name", "", "Это имя уже занято");
     }

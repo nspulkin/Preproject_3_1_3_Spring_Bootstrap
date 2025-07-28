@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
@@ -27,26 +26,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/auth/registration", "/auth/login", "/error").permitAll()
-                .antMatchers("/user/**").hasAnyRole("ADMIN","USER")
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().loginProcessingUrl("/process_login").successHandler(successUserHandler).loginPage("/auth/login")
-                .permitAll()
-                .and()
-                .logout()
-                .logoutUrl("/user/logout")
-                .logoutSuccessUrl("/auth/login")
-                .permitAll();
+        http.csrf().disable().authorizeRequests().antMatchers("/auth/registration", "/auth/login", "/error").permitAll().antMatchers("/user/**").hasAnyRole("ADMIN", "USER").antMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated().and().formLogin().loginProcessingUrl("/process_login").successHandler(successUserHandler).loginPage("/auth/login").permitAll().and().logout().logoutUrl("/user/logout").logoutSuccessUrl("/auth/login").permitAll();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService)
-                .passwordEncoder(getPasswordEncoder());
+        auth.userDetailsService(userService).passwordEncoder(getPasswordEncoder());
     }
 
     @Bean

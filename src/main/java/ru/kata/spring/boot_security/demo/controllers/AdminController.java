@@ -53,12 +53,10 @@ public class AdminController {
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("user") @Valid User user,
-                         BindingResult bindingResult) {
+    public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         userValidate.validate(user, bindingResult);
 
-        if (bindingResult.hasErrors())
-            return "admin/new";
+        if (bindingResult.hasErrors()) return "admin/new";
 
         registrationService.register(user);
         return "redirect:admin";
@@ -71,7 +69,7 @@ public class AdminController {
         user.setName(name);
         user.setAge(age);
         user.setEmail(email);
-        Role newRole = new Role("ROLE_"+role);
+        Role newRole = new Role("ROLE_" + role);
         user.setRoles(Collections.singleton(newRole));
         roleService.save(newRole);
         userService.update(id, user);
