@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="row">
+    <div class="col bg-dark">
+        <nav class="navbar navbar-light bg-dark">
+            <span class="navbar-text text-white">
+                <b> <td th:utext="${thisUser.getEmail()}"></td> </b>
+                <td>with roles:</td>
+                <td th:each="role : ${thisUser.getRoles()}" th:text="${role.getName()}"></td>
+            </span>
+            <a class="nav-link text-secondary font-weight-bold text-right" href="/user/logout">Logout</a>
+        </nav>
+    </div>
+</div>
+
+<div class="row h-100">
+
+    <div class="col-2  bg-white list-group">
+        <ul class="nav nav-tabs my-2 flex-column nav-pills">
+
+            <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item">
+                <a class="nav-link active" href="/admin">Admin</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/user">User</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="col my-3 mx-3 tab-content">
+        <div class="tab-pane active">
+            <h2>Admin panel</h2>
+
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Users table</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/admin/new">New User</a>
+                </li>
+            </ul>
+
+            <div class="tab-pane">
+                <h1>All users</h1>
+                <div class="row">
+                    <div class="col mx-3 border border-light" style="background-color: #ffffff">
+                        <div class="row bg-white">
+                            <div class="col my-3">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Age</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Edit</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="userFromList : ${listUser}">
+                                            <td id="idTd" th:text="${userFromList.getId()}"></td>
+                                            <td id="nameTd" th:text="${userFromList.getUsername()}"></td>
+                                            <td id="ageTd" th:text="${userFromList.getAge()}"></td>
+                                            <td id="emailTd" th:text="${userFromList.getEmail()}"></td>
+                                            <td id="roleTd" th:each="role : ${userFromList.getRoles()}" th:text="${role.getName()}"></td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary editUser" data-toggle="modal" data-target="#editModal">Edit</button>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger deleteUser" data-toggle="modal" data-target="#myModalDelete">Delete</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--EDIT USER-->
+<div>
+    <form class="formEditUser">
+        <div id="editModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalCenterTitle">Edit user</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row bg-white" >
+                            <div class="col-6 mx-auto text-center font-weight-bold">
+                                ID
+                                <input type="number" name="id" id="idInput" readonly class="form-control"></div>
+                        </div>
+                        <div class="row bg-white" >
+                            <div class="col-6 mx-auto text-center font-weight-bold my-2">
+                                Username
+                                <input type="text" name="name" id="nameInput" class="form-control"></div>
+                        </div>
+
+                        <div class="row bg-white" >
+                            <div class="col-6 mx-auto text-center font-weight-bold my-2">
+                                Age
+                                <input type="number" name="age" id="ageInput" class="form-control"></div>
+                        </div>
+
+                        <div class="row bg-white" >
+                            <div class="col-6 mx-auto text-center font-weight-bold">
+                                Email
+                                <input type="email" name="email"  id="emailInput" class="form-control"></div>
+                        </div>
+
+                        <div class="row bg-white" >
+                            <div class="col-6 mx-auto text-center font-weight-bold my-2">
+                                Password
+                                <input type="password"  name="password" id="passwordInput" class="form-control"></div>
+                        </div>
+
+                        <div class="row bg-white" >
+                            <div class="col-6 mx-auto text-center font-weight-bold">
+                                Role
+                                <select class="custom-select form-control" multiple name="role" id="roleInput" size="2" >
+                                    <option>ADMIN</option>
+                                    &nbsp
+                                    <option>USER</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" data-dismiss="modal" class="btn btn-primary editBtn">Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<!-------->
+<!-- Modal-->
+<div>
+    <form class="formDeleteUser">
+        <div id="myModalDelete" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalDelete">Delete user</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row bg-white " >
+                            <div class="col-6 mx-auto text-center font-weight-bold">
+                                ID
+                                <input type="number" name="id" id="idDelete" readonly class="form-control" ></div>
+                        </div>
+                        <div class="row  bg-white " >
+                            <div class="col-6 mx-auto text-center font-weight-bold my-2">
+                                First name
+                                <input type="text" name="name" id="nameDelete" readonly class="form-control"></div>
+                        </div>
+
+                        <div class="row bg-white " >
+                            <div class="col-6 mx-auto text-center font-weight-bold my-2">
+                                Age
+                                <input type="number" name="age" id="ageDelete" readonly class="form-control" ></div>
+                        </div>
+                        <div class="row bg-white " >
+                            <div class="col-6 mx-auto text-center font-weight-bold">
+                                Email
+                                <input type="email" name="email" id="emailDelete" readonly class="form-control"></div>
+                        </div>
+                        <div class="row bg-white " >
+                            <div class="col-6 mx-auto text-center font-weight-bold">
+                                Role
+                                <input type="text" name="role" id="roleDelete" readonly class="form-control"></div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit"  data-dismiss="modal"  class="btn btn-danger deleteBtn">Delete</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+<script src="/webjars/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="/webjars/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+<script>
+    const on = (element, even, selector, handle) => {
+        element.addEventListener(even, e => {
+            if (e.target.closest(selector)) {
+                handle(e)
+            }
+        })
+    }
+
+    //для модального окно при изменении
+    on(document, 'click', '.editUser', (e) => {
+        // e.preventDefault();
+        const father = e.target.parentNode.parentNode;
+        const id = father.firstElementChild.innerHTML;
+        const name = father.children[1].innerHTML;
+        const age = father.children[2].innerHTML;
+        const email = father.children[3].innerHTML;
+        $('#idInput').val(id);
+        $('#nameInput').val(name);
+        $('#ageInput').val(age);
+        $('#emailInput').val(email);
+        $('#editModal').modal();
+    })
+
+    on(document, 'click', '.editBtn', (e) => {
+        let formData = $(".formEditUser").serializeArray();
+        $.ajax({
+            url: '/admin/edit?id='+$('#idInput').val(),
+            method: 'PUT',
+            data: formData,
+            success: function () {
+                window.location.href = "/admin"
+            },
+            error: function (xhr, type, exception) {
+                window.location.href = "/admin"
+            },
+        });
+    })
+
+    //при удалении
+    on(document, 'click', '.deleteUser', (e) => {
+        // e.preventDefault();
+        const father = e.target.parentNode.parentNode;
+        const id = father.firstElementChild.innerHTML;
+        const name = father.children[1].innerHTML;
+        const age = father.children[2].innerHTML;
+        const email = father.children[3].innerHTML;
+        const role = father.children[4].innerHTML;
+        $('#idDelete').val(id);
+        $('#nameDelete').val(name);
+        $('#ageDelete').val(age);
+        $('#emailDelete').val(email);
+        $('#roleDelete').val(role);
+        $('#myModalDelete').modal();
+    })
+
+    on(document, 'click', '.deleteBtn', (e) => {
+        $.ajax({
+            url: '/admin/delete?id='+$('#idDelete').val(),
+            method: 'DELETE',
+            success: function () {
+                window.location.href = "/admin"
+            },
+            error: function (xhr, type, exception) {
+                window.location.href = "/admin"
+            },
+        });
+    })
+</script>
+
+</body>
+</html>

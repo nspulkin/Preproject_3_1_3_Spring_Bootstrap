@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User info</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="row">
+    <div class="col bg-dark ">
+        <nav class="navbar navbar-light bg-dark">
+            <span class="navbar-text text-white">
+                <b> <td th:utext="${user.getEmail()}"></td> </b>
+                <td>with roles:</td>
+                <td th:each="role : ${user.getRoles()}" th:text="${role.getName()}"></td>
+            </span>
+            <a class="nav-link text-secondary font-weight-boldt text-right" href="/user/logout">Logout</a>
+        </nav>
+    </div>
+</div>
+
+<div class="row h-100">
+
+    <div class="col-2  bg-white list-group">
+        <ul class="nav nav-tabs my-2 flex-column nav-pills">
+
+            <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item">
+                <a class="nav-link" href="/admin">Admin</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link active" href="/user">User</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="col my-3 mx-3 tab-content">
+        <div class="tab-pane active " id="main1">
+            <div class="tab-pane">
+                <h1>User information page</h1>
+                <div class="row">
+                    <div class="col mx-3 border border-light" style="background-color: #f5f5f5">
+                        <h2>About user</h2>
+
+                        <div class="row bg-white ">
+                            <div class="col my-3  ">
+                                <table class="table table-striped  ">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Age</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                    </tr>
+
+                                    <tr>
+                                        <td th:text="${user.getId()}"></td>
+                                        <td th:text="${user.getUsername()}"></td>
+                                        <td th:text="${user.getAge()}"></td>
+                                        <td th:text="${user.getEmail()}"></td>
+                                        <td th:each="role : ${user.getRoles()}" th:text="${role.getName()}"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+<script src="/webjars/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="/webjars/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+</body>
+</html>

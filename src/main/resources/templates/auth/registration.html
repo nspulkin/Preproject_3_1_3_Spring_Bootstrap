@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+
+<form class="form-group" th:method="POST" th:action="@{/auth/registration}" th:object="${user}">
+    <div class="mx-auto my-5" style="width: 300px;">
+        <label ><h3>Please sign up</h3></label>
+
+        <input type="text" th:field="*{name}" id="name" class="form-control" placeholder="Username"/>
+        <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Username Error</div>
+
+        <input type="text" th:field="*{age}" id="age" class="form-control" placeholder="Age"/>
+        <div style="color:red" th:if="${#fields.hasErrors('age')}" th:errors="*{age}">Age Error</div>
+
+        <input type="text" th:field="*{email}" id="email" class="form-control" placeholder="Email"/>
+        <div style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</div>
+
+        <input type="password" th:field="*{password}" id="password" class="form-control" placeholder="Password"/>
+        <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</div>
+
+        <button type="submit" class="btn btn-primary my-2 btn-block signUp">Sign up</button>
+    </div>
+</form>
+
+<script src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+<script src="/webjars/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="/webjars/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+</body>
+</html>
