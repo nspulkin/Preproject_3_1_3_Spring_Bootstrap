@@ -56,7 +56,9 @@ public class AdminController {
     public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         userValidate.validate(user, bindingResult);
 
-        if (bindingResult.hasErrors()) return "admin/new";
+        if (bindingResult.hasErrors()) {
+            return "admin/new";
+        }
 
         registrationService.register(user);
         return "redirect:admin";

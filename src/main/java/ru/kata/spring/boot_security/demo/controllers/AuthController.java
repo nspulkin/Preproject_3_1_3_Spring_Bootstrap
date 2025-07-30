@@ -43,7 +43,9 @@ public class AuthController {
     public String performRegistration(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
         userValidate.validate(user, bindingResult);
 
-        if (bindingResult.hasErrors()) return "/auth/registration";
+        if (bindingResult.hasErrors()) {
+            return "/auth/registration";
+        }
 
         registrationService.register(user);
         return "redirect:/auth/login";

@@ -14,34 +14,30 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
+
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "password")
     @Size(min = 3, message = "Минимум 3 символа")
     @NotEmpty(message = "Где пароль?")
     private String password;
 
     @Min(value = 0, message = "Не тот возраст")
-    @Column(name = "age")
     private int age;
 
     @NotEmpty(message = "Введи почту")
     @Email(message = "Это не почта")
-    @Column(name = "email")
     private String email;
 
-    @Column(name = "role")
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // Используем ManyToMany для связи с ролями
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
     public User() {
-
     }
 
     public User(String name, String password, int age, String email, Set<Role> roles) {
@@ -130,4 +126,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
