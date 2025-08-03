@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.models;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -33,7 +34,7 @@ public class User implements UserDetails {
     private String email;
 
     // Используем ManyToMany для связи с ролями
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
@@ -93,6 +94,7 @@ public class User implements UserDetails {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles;
     }

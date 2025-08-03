@@ -8,33 +8,69 @@ import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 
 @Service
 public class RoleServiceImpl implements RoleService {
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
     public RoleServiceImpl(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
+        try {
+            if (roleRepository == null) {
+                throw new IllegalArgumentException("RoleRepository cannot be null");
+            }
+            this.roleRepository = roleRepository;
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при инициализации RoleServiceImpl", e);
+        }
     }
 
     @Override
     @Transactional
     public void save(Role role) {
-        roleRepository.save(role);
+        try {
+            if (role == null) {
+                throw new IllegalArgumentException("Role cannot be null");
+            }
+            roleRepository.save(role);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при сохранении роли", e);
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Role getRoleById(int id) {
-        return roleRepository.findById(id).orElse(null);
+        try {
+            if (id <= 0) {
+                return null;
+            }
+            return roleRepository.findById(id).orElse(null);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при получении роли", e);
+        }
     }
 
     @Override
     @Transactional
     public void deleteRoleById(int id) {
-        roleRepository.deleteById(id);
+        try {
+            if (id <= 0) {
+                throw new IllegalArgumentException("Invalid role ID");
+            }
+            roleRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при удалении роли", e);
+        }
     }
 
     @Override
     @Transactional
     public void deleteRole(Role role) {
-        roleRepository.delete(role);
+        try {
+            if (role == null) {
+                throw new IllegalArgumentException("Role cannot be null");
+            }
+            roleRepository.delete(role);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при удалении роли", e);
+        }
     }
 }

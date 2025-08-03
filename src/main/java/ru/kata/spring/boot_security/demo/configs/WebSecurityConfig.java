@@ -10,39 +10,69 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    private SuccessUserHandler successUserHandler;
-    private UserService userService;
+    private final SuccessUserHandler successUserHandler;
+    private final UserService userService;
 
     @Autowired
     public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService) {
-        this.successUserHandler = successUserHandler;
-        this.userService = userService;
+        try {
+            if (successUserHandler == null) {
+                throw new IllegalArgumentException("SuccessUserHandler cannot be null");
+            }
+            if (userService == null) {
+                throw new IllegalArgumentException("UserService cannot be null");
+            }
+
+            this.successUserHandler = successUserHandler;
+            this.userService = userService;
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при инициализации WebSecurityConfig", e);
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable().authorizeRequests().antMatchers("/auth/registration", "/auth/login", "/error").permitAll().antMatchers("/user/**").hasAnyRole("ADMIN", "USER").antMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated().and().formLogin().loginProcessingUrl("/process_login").successHandler(successUserHandler).loginPage("/auth/login").permitAll().and().logout().logoutUrl("/user/logout").logoutSuccessUrl("/auth/login").permitAll();
+        try {
+            http.csrf().disable().authorizeRequests().antMatchers("/auth/registration", "/auth/login", "/error").permitAll().antMatchers("/user/**").hasAnyRole("ADMIN", "USER").antMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated().and().formLogin().loginProcessingUrl("/process_login").successHandler(successUserHandler).loginPage("/auth/login").permitAll().and().logout().logoutUrl("/user/logout").logoutSuccessUrl("/auth/login").permitAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при настройке HTTP безопасности", e);
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(getPasswordEncoder());
+        try {
+            auth.userDetailsService(userService).passwordEncoder(getPasswordEncoder());
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при настройке аутентификации", e);
+        }
     }
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder();
+        try {
+            return new BCryptPasswordEncoder();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при создании PasswordEncoder", e);
+        }
     }
 
     // аутентификация inMemory
     @Bean
     @Override
     public UserDetailsService userDetailsService() {
-        return userService;
+        try {
+            return userService;
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при создании UserDetailsService", e);
+        }
     }
 }

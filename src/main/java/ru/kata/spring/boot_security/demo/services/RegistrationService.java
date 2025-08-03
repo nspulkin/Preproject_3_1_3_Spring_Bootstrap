@@ -13,9 +13,9 @@ import java.util.Collections;
 
 @Service
 public class RegistrationService {
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public RegistrationService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
@@ -26,13 +26,27 @@ public class RegistrationService {
 
     @Transactional
     public void register(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("User password cannot be null or empty");
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role role = new Role("ROLE_USER");
+
+        // Проверка и создание роли
+        Role role = roleRepository.findByName("ROLE_USER").orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
         user.setRoles(Collections.singleton(role));
+
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public String encodePassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
         return passwordEncoder.encode(password);
     }
 }
