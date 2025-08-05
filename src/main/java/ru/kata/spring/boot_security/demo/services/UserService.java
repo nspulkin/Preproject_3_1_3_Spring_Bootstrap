@@ -19,14 +19,15 @@ public interface UserService extends UserDetailsService {
 
     void delete(int id);
 
-    Optional<User> findByName(String name);
+
+    Optional<User> findByEmail(String email);
 
     // Новые методы для переноса логики из контроллеров
     User getCurrentUser();
 
     User createUser(User user);
 
-    User updateUser(int id, String name, String password, String email, int age, String role);
+    User updateUser(int id, String firstName, String lastName, String password, String email, int age, java.util.Set<ru.kata.spring.boot_security.demo.models.Role> roles);
 
     void deleteUser(int id);
 

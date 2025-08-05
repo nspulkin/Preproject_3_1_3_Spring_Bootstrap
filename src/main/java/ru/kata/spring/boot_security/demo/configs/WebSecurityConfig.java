@@ -40,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Transactional(readOnly = true)
     protected void configure(HttpSecurity http) throws Exception {
         try {
-            http.csrf().disable().authorizeRequests().antMatchers("/auth/registration", "/auth/login", "/error").permitAll().antMatchers("/user/**").hasAnyRole("ADMIN", "USER").antMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated().and().formLogin().loginProcessingUrl("/process_login").successHandler(successUserHandler).loginPage("/auth/login").permitAll().and().logout().logoutUrl("/user/logout").logoutSuccessUrl("/auth/login").permitAll();
+            http.csrf().disable().authorizeRequests().antMatchers("/auth/registration", "/auth/login", "/error").permitAll().antMatchers("/user/**").hasAnyAuthority("ADMIN USER", "USER").antMatchers("/admin/**").hasAuthority("ADMIN").anyRequest().authenticated().and().formLogin().loginProcessingUrl("/process_login").successHandler(successUserHandler).loginPage("/auth/login").permitAll().and().logout().logoutUrl("/user/logout").logoutSuccessUrl("/auth/login").permitAll();
         } catch (Exception e) {
             throw new RuntimeException("Ошибка при настройке HTTP безопасности", e);
         }

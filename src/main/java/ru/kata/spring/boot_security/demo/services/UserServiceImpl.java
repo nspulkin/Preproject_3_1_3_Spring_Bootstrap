@@ -12,9 +12,10 @@ import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -80,19 +81,23 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
+
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> findByName(String name) {
-        return userRepository.findByName(name);
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByName(username);
+        // Теперь ищем только по email, так как убрали поле name
+        Optional<User> user = userRepository.findByEmail(username);
+
         if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UsernameNotFoundException("User not found with email: " + username);
         }
+
         // Инициализируем роли для избежания проблем с ленивой загрузкой
         User userEntity = user.get();
         userEntity.getRoles().size(); // Это загрузит роли
@@ -102,34 +107,60 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public User getCurrentUser() {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<User> user = findByName(currentUsername);
-        if (user.isPresent()) {
-            User userEntity = user.get();
-            userEntity.getRoles().size(); // Это загрузит роли
-            return userEntity;
+        try {
+            String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+            System.out.println("Getting current user for username: " + currentUsername);
+
+            Optional<User> user = findByEmail(currentUsername);
+            if (user.isPresent()) {
+                User userEntity = user.get();
+                userEntity.getRoles().size(); // Это загрузит роли
+                System.out.println("Found current user: " + userEntity.getEmail());
+                return userEntity;
+            }
+
+            System.out.println("No current user found for: " + currentUsername);
+            return null;
+        } catch (Exception e) {
+            System.err.println("Error getting current user: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     @Override
     @Transactional
     public User createUser(User user) {
+        System.out.println("=== UserServiceImpl.createUser called ===");
+        System.out.println("User: " + (user != null ? user.getEmail() : "null"));
+
         if (user == null) {
+            System.err.println("User is null");
             throw new IllegalArgumentException("User cannot be null");
         }
-        Optional<User> existingUser = findByName(user.getName());
-        if (existingUser.isPresent()) {
-            throw new IllegalArgumentException("User already exists");
+
+        try {
+            Optional<User> existingUser = findByEmail(user.getEmail());
+            if (existingUser.isPresent()) {
+                System.err.println("User with email '" + user.getEmail() + "' already exists");
+                throw new IllegalArgumentException("User already exists");
+            }
+
+            System.out.println("Calling registrationService.register");
+            registrationService.register(user);
+            System.out.println("User created successfully");
+            return user;
+        } catch (Exception e) {
+            System.err.println("Exception in createUser: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-        registrationService.register(user);
-        return user;
     }
 
     @Override
     @Transactional
-    public User updateUser(int id, String name, String password, String email, int age, String role) {
-        if (id <= 0 || name == null || email == null || role == null) {
+    public User updateUser(int id, String firstName, String lastName, String password, String email, int age, Set<Role> roles) {
+        if (id <= 0 || email == null) {
             throw new IllegalArgumentException("Invalid parameters");
         }
 
@@ -140,13 +171,14 @@ public class UserServiceImpl implements UserService {
 
         User user = new User();
         user.setId(id);
-        user.setName(name);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         user.setEmail(email);
         user.setAge(age);
-        user.setPassword(password != null && password.length() > 3 ? registrationService.encodePassword(password) : existingUser.getPassword());
+        user.setPassword(password != null && !password.trim().isEmpty() ? registrationService.encodePassword(password) : existingUser.getPassword());
 
-        Role userRole = roleRepository.findByName("ROLE_" + role).orElseGet(() -> roleRepository.save(new Role("ROLE_" + role)));
-        user.setRoles(Collections.singleton(userRole));
+        // Устанавливаем роли
+        user.setRoles(roles != null ? roles : new HashSet<>());
 
         update(id, user);
         return user;

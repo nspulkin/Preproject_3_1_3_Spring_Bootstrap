@@ -26,20 +26,40 @@ public class RegistrationService {
 
     @Transactional
     public void register(User user) {
+        System.out.println("=== RegistrationService.register called ===");
+        System.out.println("User: " + (user != null ? user.getEmail() : "null"));
+
         if (user == null) {
+            System.err.println("User is null");
             throw new IllegalArgumentException("User cannot be null");
         }
+
         if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            System.err.println("Password is null or empty");
             throw new IllegalArgumentException("User password cannot be null or empty");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        try {
+            System.out.println("Encoding password");
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // Проверка и создание роли
-        Role role = roleRepository.findByName("ROLE_USER").orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
-        user.setRoles(Collections.singleton(role));
+            // Если роли не установлены, устанавливаем роль USER по умолчанию
+            if (user.getRoles() == null || user.getRoles().isEmpty()) {
+                System.out.println("No roles set, setting default USER role");
+                Role role = roleRepository.findByName("USER").orElseGet(() -> roleRepository.save(new Role("USER")));
+                user.setRoles(Collections.singleton(role));
+            } else {
+                System.out.println("User has " + user.getRoles().size() + " roles already set, not overwriting");
+            }
 
-        userRepository.save(user);
+            System.out.println("Saving user to repository");
+            userRepository.save(user);
+            System.out.println("User saved successfully");
+        } catch (Exception e) {
+            System.err.println("Exception in register: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Transactional(readOnly = true)
@@ -50,3 +70,4 @@ public class RegistrationService {
         return passwordEncoder.encode(password);
     }
 }
+

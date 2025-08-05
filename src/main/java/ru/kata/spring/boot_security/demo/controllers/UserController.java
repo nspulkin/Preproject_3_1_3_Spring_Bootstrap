@@ -36,7 +36,8 @@ public class UserController {
             if (currentUser == null) {
                 return "redirect:/auth/login";
             }
-            user.setName(currentUser.getName());
+            user.setFirstName(currentUser.getFirstName());
+            user.setLastName(currentUser.getLastName());
             user.setId(currentUser.getId());
             user.setAge(currentUser.getAge());
             user.setEmail(currentUser.getEmail());

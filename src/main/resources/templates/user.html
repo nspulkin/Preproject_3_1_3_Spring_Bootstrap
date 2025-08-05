@@ -26,11 +26,11 @@
     <div class="col-2  bg-white list-group">
         <ul class="nav nav-tabs my-2 flex-column nav-pills">
 
-            <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item">
+            <li sec:authorize="hasRole('ADMIN')" class="nav-item">
                 <a class="nav-link" href="/admin">Admin</a>
             </li>
 
-            <li class="nav-item">
+            <li sec:authorize="hasRole('USER')" class="nav-item">
                 <a class="nav-link active" href="/user">User</a>
             </li>
         </ul>
@@ -49,7 +49,8 @@
                                 <table class="table table-striped  ">
                                     <tr>
                                         <th>ID</th>
-                                        <th>Name</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
                                         <th>Age</th>
                                         <th>Email</th>
                                         <th>Role</th>
@@ -57,7 +58,8 @@
 
                                     <tr>
                                         <td th:text="${user.getId()}"></td>
-                                        <td th:text="${user.getUsername()}"></td>
+                                        <td th:text="${user.getFirstName()}"></td>
+                                        <td th:text="${user.getLastName()}"></td>
                                         <td th:text="${user.getAge()}"></td>
                                         <td th:text="${user.getEmail()}"></td>
                                         <td th:each="role : ${user.getRoles()}" th:text="${role.getName()}"></td>

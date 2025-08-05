@@ -45,28 +45,30 @@ public class DataLoader implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         try {
-            // Проверяем, существует ли роль "ROLE_USER"
-            Role userRole = roleRepository.findByName("ROLE_USER").orElseGet(() -> {
-                Role role = new Role("ROLE_USER");
+            // Проверяем, существует ли роль "USER"
+            Role userRole = roleRepository.findByName("USER").orElseGet(() -> {
+                Role role = new Role("USER");
                 return roleRepository.save(role);
             });
 
-            // Проверяем, существует ли роль "ROLE_ADMIN"
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseGet(() -> {
-                Role role = new Role("ROLE_ADMIN");
+            // Проверяем, существует ли роль "ADMIN"
+            Role adminRole = roleRepository.findByName("ADMIN").orElseGet(() -> {
+                Role role = new Role("ADMIN");
                 return roleRepository.save(role);
             });
 
-            // Создаем администратора с ролью "ROLE_ADMIN" только если он не существует
-            if (userService.findByName("admin").isEmpty()) {
-                User admin = new User("admin", passwordEncoder.encode("admin"), 30, "admin@example.com", Set.of(adminRole, userRole));
+            // Создаем администратора с ролью "ADMIN" только если он не существует
+            if (userService.findByEmail("admin@mail.ru").isEmpty()) {
+                User admin = new User("admin", "admin", passwordEncoder.encode("admin"), 30, "admin@mail.ru", Set.of(adminRole, userRole));
                 userService.save(admin);
+                System.out.println("admin admin created with email: admin@mail.ru");
             }
 
             // Создаем обычного пользователя только если он не существует
-            if (userService.findByName("user").isEmpty()) {
-                User user = new User("user", passwordEncoder.encode("user"), 25, "user@example.com", Set.of(userRole));
+            if (userService.findByEmail("user@mail.ru").isEmpty()) {
+                User user = new User("user", "user", passwordEncoder.encode("user"), 25, "user@mail.ru", Set.of(userRole));
                 userService.save(user);
+                System.out.println("user user created with email: user@mail.ru");
             }
         } catch (Exception e) {
             System.err.println("Ошибка при инициализации данных: " + e.getMessage());

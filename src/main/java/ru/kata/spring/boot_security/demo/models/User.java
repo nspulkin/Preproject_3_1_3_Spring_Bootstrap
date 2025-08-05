@@ -20,7 +20,13 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String name;
+    // Убираем поле name, оставляем только firstName и lastName
+
+    @Size(min = 2, message = "Имя должно содержать минимум 2 символа")
+    private String firstName;
+
+    @Size(min = 2, message = "Фамилия должна содержать минимум 2 символа")
+    private String lastName;
 
     @Size(min = 3, message = "Минимум 3 символа")
     @NotEmpty(message = "Где пароль?")
@@ -41,8 +47,9 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String name, String password, int age, String email, Set<Role> roles) {
-        this.name = name;
+    public User(String firstName, String lastName, String password, int age, String email, Set<Role> roles) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.password = password;
         this.age = age;
         this.email = email;
@@ -57,12 +64,21 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public int getAge() {
@@ -106,7 +122,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return name;
+        return email;
     }
 
     @Override

@@ -3,7 +3,7 @@
       xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Users</title>
+    <title>Admin panel</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
@@ -13,9 +13,10 @@
     <div class="col bg-dark">
         <nav class="navbar navbar-light bg-dark">
             <span class="navbar-text text-white">
-                <b> <td th:utext="${thisUser.getEmail()}"></td> </b>
-                <td>with roles:</td>
-                <td th:each="role : ${thisUser.getRoles()}" th:text="${role.getName()}"></td>
+                <b th:if="${thisUser != null}" th:utext="${thisUser.getEmail()}"></b>
+                <span th:if="${thisUser != null}">with roles:</span>
+                <span th:if="${thisUser != null and thisUser.getRoles() != null}"
+                      th:each="role : ${thisUser.getRoles()}" th:text="${role.getName() + ' '}"></span>
             </span>
             <a class="nav-link text-secondary font-weight-bold text-right" href="/user/logout">Logout</a>
         </nav>
@@ -27,11 +28,11 @@
     <div class="col-2  bg-white list-group">
         <ul class="nav nav-tabs my-2 flex-column nav-pills">
 
-            <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item">
+            <li sec:authorize="hasRole('ADMIN')" class="nav-item">
                 <a class="nav-link active" href="/admin">Admin</a>
             </li>
 
-            <li class="nav-item">
+            <li sec:authorize="hasRole('USER')" class="nav-item">
                 <a class="nav-link" href="/user">User</a>
             </li>
         </ul>
@@ -43,10 +44,10 @@
 
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin">Users table</a>
+                    <a class="nav-link active" href="/admin">Users table</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/admin/new">New User</a>
+                    <a class="nav-link" href="/admin/new">New User</a>
                 </li>
             </ul>
 
@@ -60,7 +61,8 @@
                                     <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Name</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
                                         <th>Age</th>
                                         <th>Email</th>
                                         <th>Role</th>
@@ -71,11 +73,15 @@
                                     <tbody>
                                     <tr th:each="userFromList : ${listUser}">
                                         <td id="idTd" th:text="${userFromList.getId()}"></td>
-                                        <td id="nameTd" th:text="${userFromList.getUsername()}"></td>
+                                        <td id="firstNameTd" th:text="${userFromList.getFirstName()}"></td>
+                                        <td id="lastNameTd" th:text="${userFromList.getLastName()}"></td>
                                         <td id="ageTd" th:text="${userFromList.getAge()}"></td>
                                         <td id="emailTd" th:text="${userFromList.getEmail()}"></td>
-                                        <td id="roleTd" th:each="role : ${userFromList.getRoles()}"
-                                            th:text="${role.getName()}"></td>
+                                        <td id="roleTd">
+                                            <div th:each="role : ${userFromList.getRoles()}"
+                                                 th:text="${role.getName()}"
+                                                 style="display: block; margin-bottom: 2px;"></div>
+                                        </td>
                                         <td>
                                             <button type="button" class="btn btn-primary editUser" data-toggle="modal"
                                                     data-target="#editModal">Edit
@@ -119,8 +125,14 @@
                         </div>
                         <div class="row bg-white">
                             <div class="col-6 mx-auto text-center font-weight-bold my-2">
-                                Username
-                                <input type="text" name="name" id="nameInput" class="form-control"></div>
+                                First name
+                                <input type="text" name="firstName" id="firstNameInput" class="form-control"></div>
+                        </div>
+
+                        <div class="row bg-white">
+                            <div class="col-6 mx-auto text-center font-weight-bold my-2">
+                                Last name
+                                <input type="text" name="lastName" id="lastNameInput" class="form-control"></div>
                         </div>
 
                         <div class="row bg-white">
@@ -138,7 +150,8 @@
                         <div class="row bg-white">
                             <div class="col-6 mx-auto text-center font-weight-bold my-2">
                                 Password
-                                <input type="password" name="password" id="passwordInput" class="form-control"></div>
+                                <input type="password" name="password" id="passwordInput" class="form-control"
+                                       placeholder="Enter new password (leave empty to keep current)"></div>
                         </div>
 
                         <div class="row bg-white">
@@ -184,7 +197,15 @@
                         <div class="row  bg-white ">
                             <div class="col-6 mx-auto text-center font-weight-bold my-2">
                                 First name
-                                <input type="text" name="name" id="nameDelete" readonly class="form-control"></div>
+                                <input type="text" name="firstName" id="firstNameDelete" readonly class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row  bg-white ">
+                            <div class="col-6 mx-auto text-center font-weight-bold my-2">
+                                Last name
+                                <input type="text" name="lastName" id="lastNameDelete" readonly class="form-control">
+                            </div>
                         </div>
 
                         <div class="row bg-white ">
@@ -234,13 +255,34 @@
         // e.preventDefault();
         const father = e.target.parentNode.parentNode;
         const id = father.firstElementChild.innerHTML;
-        const name = father.children[1].innerHTML;
-        const age = father.children[2].innerHTML;
-        const email = father.children[3].innerHTML;
+        const firstName = father.children[1].innerHTML;
+        const lastName = father.children[2].innerHTML;
+        const age = father.children[3].innerHTML;
+        const email = father.children[4].innerHTML;
+
+        // Получаем роли пользователя
+        const roleDiv = father.children[5];
+        const roles = [];
+        roleDiv.querySelectorAll('div').forEach(div => {
+            roles.push(div.textContent.trim());
+        });
+
         $('#idInput').val(id);
-        $('#nameInput').val(name);
+        $('#firstNameInput').val(firstName);
+        $('#lastNameInput').val(lastName);
         $('#ageInput').val(age);
         $('#emailInput').val(email);
+
+        // Сбрасываем и устанавливаем роли
+        $('#roleInput option').prop('selected', false);
+        roles.forEach(role => {
+            $('#roleInput option').each(function () {
+                if ($(this).text().trim() === role) {
+                    $(this).prop('selected', true);
+                }
+            });
+        });
+
         $('#editModal').modal();
     })
 
@@ -264,15 +306,25 @@
         // e.preventDefault();
         const father = e.target.parentNode.parentNode;
         const id = father.firstElementChild.innerHTML;
-        const name = father.children[1].innerHTML;
-        const age = father.children[2].innerHTML;
-        const email = father.children[3].innerHTML;
-        const role = father.children[4].innerHTML;
+        const firstName = father.children[1].innerHTML;
+        const lastName = father.children[2].innerHTML;
+        const age = father.children[3].innerHTML;
+        const email = father.children[4].innerHTML;
+
+        // Получаем роли пользователя
+        const roleDiv = father.children[5];
+        const roles = [];
+        roleDiv.querySelectorAll('div').forEach(div => {
+            roles.push(div.textContent.trim());
+        });
+        const roleText = roles.join(', ');
+
         $('#idDelete').val(id);
-        $('#nameDelete').val(name);
+        $('#firstNameDelete').val(firstName);
+        $('#lastNameDelete').val(lastName);
         $('#ageDelete').val(age);
         $('#emailDelete').val(email);
-        $('#roleDelete').val(role);
+        $('#roleDelete').val(roleText);
         $('#myModalDelete').modal();
     })
 

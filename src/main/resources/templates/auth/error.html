@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Ошибка</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Произошла ошибка</h5>
+                    <p class="card-text">
+                        <strong>Код ошибки:</strong> <span th:text="${status}">500</span>
+                    </p>
+                    <p class="card-text" th:if="${message}">
+                        <strong>Сообщение:</strong> <span th:text="${message}"></span>
+                    </p>
+                    <p class="card-text" th:if="${exception}">
+                        <strong>Исключение:</strong> <span th:text="${exception}"></span>
+                    </p>
+                    <p class="card-text">
+                        Если вы видите ошибку 403 (Forbidden), это означает, что у вас нет прав для доступа к этой
+                        странице.
+                        Попробуйте войти с правильными учетными данными.
+                    </p>
+                    <a href="/auth/login" class="btn btn-primary">Вернуться к входу</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+<script src="/webjars/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
