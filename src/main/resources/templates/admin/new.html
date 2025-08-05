@@ -15,8 +15,7 @@
             <span class="navbar-text text-white">
                 <b th:if="${thisUser != null}" th:utext="${thisUser.getEmail()}"></b>
                 <span th:if="${thisUser != null}">with roles:</span>
-                <span th:if="${thisUser != null and thisUser.getRoles() != null}"
-                      th:each="role : ${thisUser.getRoles()}" th:text="${role.getName() + ' '}"></span>
+                <span th:if="${thisUser != null and thisUser.getRoles() != null}" th:each="role : ${thisUser.getRoles()}" th:text="${role.getName() + ' '}"></span>
             </span>
             <a class="nav-link text-secondary font-weight-bold text-right" href="/user/logout">Logout</a>
         </nav>
@@ -27,11 +26,13 @@
     <div class="col-2 bg-white list-group">
         <ul class="nav nav-tabs my-2 flex-column nav-pills">
 
-            <li sec:authorize="hasRole('ADMIN')" class="nav-item">
+            <!-- Показываем Admin вкладку для администраторов -->
+            <li sec:authorize="hasAuthority('ADMIN')" class="nav-item">
                 <a class="nav-link active" href="/admin">Admin</a>
             </li>
 
-            <li sec:authorize="hasRole('USER')" class="nav-item">
+            <!-- Показываем User вкладку для всех пользователей -->
+            <li class="nav-item">
                 <a class="nav-link" href="/user">User</a>
             </li>
         </ul>
@@ -64,8 +65,7 @@
                                         <label>First name</label>
                                         <input type="text" th:field="*{firstName}" id="firstName" class="form-control"
                                                placeholder="First name"/>
-                                        <div style="color:red" th:if="${#fields.hasErrors('firstName')}"
-                                             th:errors="*{firstName}">
+                                        <div style="color:red" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">
                                             First name Error
                                         </div>
                                     </div>
@@ -76,8 +76,7 @@
                                         <label>Last name</label>
                                         <input type="text" th:field="*{lastName}" id="lastName" class="form-control"
                                                placeholder="Last name"/>
-                                        <div style="color:red" th:if="${#fields.hasErrors('lastName')}"
-                                             th:errors="*{lastName}">
+                                        <div style="color:red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">
                                             Last name Error
                                         </div>
                                     </div>
@@ -119,13 +118,11 @@
                                 <div class="row bg-white mb-3">
                                     <div class="col-12 text-center font-weight-bold">
                                         <label>Role</label>
-                                        <select class="custom-select form-control" multiple name="role" id="role"
-                                                size="2">
+                                        <select class="custom-select form-control" multiple name="role" id="role" size="2">
                                             <option value="USER">USER</option>
                                             <option value="ADMIN">ADMIN</option>
                                         </select>
-                                        <div style="color:red" th:if="${#fields.hasErrors('roles')}"
-                                             th:errors="*{roles}">
+                                        <div style="color:red" th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}">
                                             Role Error
                                         </div>
                                     </div>

@@ -15,8 +15,7 @@
             <span class="navbar-text text-white">
                 <b th:if="${thisUser != null}" th:utext="${thisUser.getEmail()}"></b>
                 <span th:if="${thisUser != null}">with roles:</span>
-                <span th:if="${thisUser != null and thisUser.getRoles() != null}"
-                      th:each="role : ${thisUser.getRoles()}" th:text="${role.getName() + ' '}"></span>
+                <span th:if="${thisUser != null and thisUser.getRoles() != null}" th:each="role : ${thisUser.getRoles()}" th:text="${role.getName() + ' '}"></span>
             </span>
             <a class="nav-link text-secondary font-weight-bold text-right" href="/user/logout">Logout</a>
         </nav>
@@ -28,11 +27,13 @@
     <div class="col-2  bg-white list-group">
         <ul class="nav nav-tabs my-2 flex-column nav-pills">
 
-            <li sec:authorize="hasRole('ADMIN')" class="nav-item">
+            <!-- Показываем Admin вкладку для администраторов -->
+            <li sec:authorize="hasAuthority('ADMIN')" class="nav-item">
                 <a class="nav-link active" href="/admin">Admin</a>
             </li>
 
-            <li sec:authorize="hasRole('USER')" class="nav-item">
+            <!-- Показываем User вкладку для всех пользователей -->
+            <li class="nav-item">
                 <a class="nav-link" href="/user">User</a>
             </li>
         </ul>
@@ -150,8 +151,7 @@
                         <div class="row bg-white">
                             <div class="col-6 mx-auto text-center font-weight-bold my-2">
                                 Password
-                                <input type="password" name="password" id="passwordInput" class="form-control"
-                                       placeholder="Enter new password (leave empty to keep current)"></div>
+                                <input type="password" name="password" id="passwordInput" class="form-control" placeholder="Enter new password (leave empty to keep current)"></div>
                         </div>
 
                         <div class="row bg-white">
@@ -197,15 +197,13 @@
                         <div class="row  bg-white ">
                             <div class="col-6 mx-auto text-center font-weight-bold my-2">
                                 First name
-                                <input type="text" name="firstName" id="firstNameDelete" readonly class="form-control">
-                            </div>
+                                <input type="text" name="firstName" id="firstNameDelete" readonly class="form-control"></div>
                         </div>
 
                         <div class="row  bg-white ">
                             <div class="col-6 mx-auto text-center font-weight-bold my-2">
                                 Last name
-                                <input type="text" name="lastName" id="lastNameDelete" readonly class="form-control">
-                            </div>
+                                <input type="text" name="lastName" id="lastNameDelete" readonly class="form-control"></div>
                         </div>
 
                         <div class="row bg-white ">
@@ -276,7 +274,7 @@
         // Сбрасываем и устанавливаем роли
         $('#roleInput option').prop('selected', false);
         roles.forEach(role => {
-            $('#roleInput option').each(function () {
+            $('#roleInput option').each(function() {
                 if ($(this).text().trim() === role) {
                     $(this).prop('selected', true);
                 }

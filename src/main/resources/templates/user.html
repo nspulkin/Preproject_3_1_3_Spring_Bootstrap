@@ -12,9 +12,9 @@
     <div class="col bg-dark ">
         <nav class="navbar navbar-light bg-dark">
             <span class="navbar-text text-white">
-                <b> <td th:utext="${user.getEmail()}"></td> </b>
-                <td>with roles:</td>
-                <td th:each="role : ${user.getRoles()}" th:text="${role.getName()}"></td>
+                <b th:utext="${user.getEmail()}"></b>
+                <span>with roles:</span>
+                <span th:each="role : ${user.getRoles()}" th:text="${role.getName() + ' '}"></span>
             </span>
             <a class="nav-link text-secondary font-weight-boldt text-right" href="/user/logout">Logout</a>
         </nav>
@@ -26,11 +26,13 @@
     <div class="col-2  bg-white list-group">
         <ul class="nav nav-tabs my-2 flex-column nav-pills">
 
-            <li sec:authorize="hasRole('ADMIN')" class="nav-item">
+            <!-- Показываем Admin вкладку для администраторов -->
+            <li sec:authorize="hasAuthority('ADMIN')" class="nav-item">
                 <a class="nav-link" href="/admin">Admin</a>
             </li>
 
-            <li sec:authorize="hasRole('USER')" class="nav-item">
+            <!-- Показываем User вкладку для всех пользователей -->
+            <li class="nav-item">
                 <a class="nav-link active" href="/user">User</a>
             </li>
         </ul>
